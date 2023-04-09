@@ -8,7 +8,7 @@ Created: Apr 2023
 # PARAMETERS
 #####################################################################
 #####################################################################
-API_KEY="CiZBQau4XYzOSC3FfmnU"
+API_KEY=""
 
 ######################################################
 # Video from https://github.com/anmspro/Traffic-Signal-Violation-Detection-System/tree/master/Resources
