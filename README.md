@@ -33,18 +33,27 @@ since speed detection is performed over a region of the video, marked with a gre
 
 As a result, the console gets the following output:
 
-AR606L Speed: 81.0Km/h  snapshots: 1
+AR606L Speed: 16.2Km/h  snapshots: 5
 
 AR6061 Speed: 81.0Km/h  snapshots: 1
 
-AE670S Speed: 81.0Km/h  snapshots: 1
+AE670S Speed: 40.5Km/h  snapshots: 2
 
-A968B6 Speed: 81.0Km/h  snapshots: 1
+APH188 Speed: 81.0Km/h  snapshots: 1
 
+A3K96 Speed: 40.5Km/h  snapshots: 2
 
-In which it is verified that the speed is determined by the number of snapshots in the delimited region of interest and errors coming from false registration detections such as AR6061 that is a false registration of AR606 or not even detected plates as APHI88 and A3K961
+A3K961 Speed: 81.0Km/h  snapshots: 1
 
-Comparing  with the project https://github.com/ablanco1950/DetectSpeedLicensePlate_Yolov8_Filters_PaddleOCR the results seem worse as fewer snapshots are detected (safe from later adjustments)
+3K96 Speed: 81.0Km/h  snapshots: 1
+
+A968B6 Speed: 40.5Km/h  snapshots: 2
+
+AV6190 Speed: 27.0Km/h  snapshots: 3
+
+In which it is verified that the speed is determined by the number of snapshots in the delimited region of interest and errors coming from false registration detections such as AR6061 that is a false registration of AR606L or A3K96 and 3K96 that are  false detection of A3K961
+
+Comparing  with the project https://github.com/ablanco1950/DetectSpeedLicensePlate_Yolov8_Filters_PaddleOCR the results are distinct but similars.
 
 A camera with more frames per second is needed, a computer  with better features and better license plate detection. And/or a routine that will detect similarities between two consecutive license plates and flag them as erroneous.
 
