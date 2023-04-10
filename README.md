@@ -47,11 +47,14 @@ A968B6 Speed: 40.5Km/h  snapshots: 2
 
 AV6190 Speed: 40.5Km/h  snapshots: 2
 
-In which it is verified that the speed is determined by the number of snapshots in the delimited region of interest
 
 Comparing  with the project https://github.com/ablanco1950/DetectSpeedLicensePlate_Yolov8_Filters_PaddleOCR the results are distinct but similars.
 
-A camera with more frames per second is needed, a computer  with better features and better license plate detection. And/or a routine that will detect similarities between two consecutive license plates and flag them as erroneous.
+In which it is verified that the speed is determined by the number of snapshots in the delimited region of interest. There is one error from false detections of plate A3K961 that is detected as A3k96, and spurious plate: 5T0S
+
+Adjustments would be necessary with real and verifiable cases.
+
+A camera with more frames per second is needed, a computer with better features and better license plate detection.
 
 You also get a logging file VIDEOLicenseResults.txt with the detected license plates
 
