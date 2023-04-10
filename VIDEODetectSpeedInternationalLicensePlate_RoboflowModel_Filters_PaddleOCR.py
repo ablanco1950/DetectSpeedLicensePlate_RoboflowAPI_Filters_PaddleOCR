@@ -71,7 +71,8 @@ X_resize=220
 Y_resize=70
 
 import imutils
-Poligono=[[200,500],[200,700],[1250,700],[1250,500]]
+
+Poligono=[[200,485],[200,655],[1250,655],[1250,485]]
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 polygon1 = Polygon(Poligono)
@@ -355,7 +356,7 @@ def FindLicenseNumber (gray, x_offset, y_offset,  License, x_resize, y_resize, \
                print(License + " detected with Filter image concat "+ text) 
     
     
-    
+    """
     kernel = np.ones((3,3),np.float32)/90
     gray1 = cv2.filter2D(gray,-1,kernel)   
     #gray_clahe = cv2.GaussianBlur(gray, (5, 5), 0) 
@@ -381,7 +382,7 @@ def FindLicenseNumber (gray, x_offset, y_offset,  License, x_resize, y_resize, \
                 print(License + " detected with CLAHE and THRESH_TOZERO as "+ text) 
     
     
-    
+    """
     for z in range(5,6):
     
        kernel = np.array([[0,-1,0], [-1,z,-1], [0,-1,0]])
@@ -402,7 +403,7 @@ def FindLicenseNumber (gray, x_offset, y_offset,  License, x_resize, y_resize, \
            else:
                print(License + " detected with Sharpen filter z= "  +str(z) + " as "+ text) 
       
-    
+    """
     gray_img_clahe=ApplyCLAHE(gray)
     
     th=OTSU_Threshold(gray_img_clahe)
@@ -426,7 +427,7 @@ def FindLicenseNumber (gray, x_offset, y_offset,  License, x_resize, y_resize, \
             else:
                 print(License + " detected with Otsu's thresholding of cv2 and THRESH_TRUNC as "+ text) 
    
-    
+    """
     threshold=ThresholdStable(gray)
     ret, gray1=cv2.threshold(gray,threshold,255,  cv2.THRESH_TRUNC) 
     #gray1 = cv2.GaussianBlur(gray1, (1, 1), 0)
@@ -523,40 +524,46 @@ def ApendTabLicensesFounded (TabLicensesFounded, ContLicensesFounded, text):
 def DetectLicenseWithRoboflow (img):
   
     TabcropLicense=[]
+    x=[]
+    y=[]
+    limitX=[]
+    limitY=[]
     #img = cv2.resize(img, (640, 640), interpolation = cv2.INTER_AREA)
     cv2.imwrite("gray.jpg",img)
     img_path = 'gray.jpg'
     inference = model.predict(img_path, confidence=40)
     #print(inference[0])
+    #print(len(inference))
     #json_load=inference
     if str(inference)=="":
-        return TabcropLicense,0,0,0,0
+        return TabcropLicense,[0],[0],[0],[0]
         
     # json.loads only admit one inference for that inference[0]
     # https://stackoverflow.com/questions/21058935/python-json-loads-shows-valueerror-extra-data
     # answer 14.1
-    json_load = (json.loads(str(inference[0])))
-  
-    i=0
-    for z in json_load:
-        i=i+1
-        if i > 4: break
-        if i==1: x=json_load[z]
-        if i==2: y=json_load[z]
-        if i==3: w=json_load[z]
-        if i==4:h=json_load[z] 
-       
-    
-    x=int(x)
-    y=int(y)
-    w=int(w)
-    h=int(h)
-    limitY=int(h/2)
-    limitX=int(w/2)
-    cropLicense=img[y-limitY:y+limitY,x-limitX:x+limitX]
-    #cv2.imshow("Crop", cropLicense)
-    #cv2.waitKey(0)
-    TabcropLicense.append(cropLicense)
+    for i in range(len(inference)):
+        json_load = (json.loads(str(inference[i])))
+      
+        p=0
+        for z in json_load:
+            p=p+1
+            if p > 4: break
+            if p==1: X=json_load[z]
+            if p==2: Y=json_load[z]
+            if p==3: W=json_load[z]
+            if p==4:H=json_load[z] 
+           
+        
+        x.append(int(X))
+        y.append(int(Y))
+        w=(int(W))
+        h=(int(H))
+        limitY.append(int(h/2))
+        limitX.append(int(w/2))
+        cropLicense=img[y[i]-limitY[i]:y[i]+limitY[i],x[i]-limitX[i]:x[i]+limitX[i]]
+        #cv2.imshow("Crop", cropLicense)
+        #cv2.waitKey(0)
+        TabcropLicense.append(cropLicense)
     return TabcropLicense, x, y, limitX, limitY
 
 
@@ -624,105 +631,107 @@ with open( "VIDEOLicenseResults.txt" ,"w") as   w:
             else:
                 ContDetected=ContDetected+1
                 print(License + " DETECTED ")
-            
-            gray=TabImgSelect[0] 
-            #if(polygon1.contains(Point(int((x+limitX)/2),int((y+limitY)/2)))):
-            if(polygon1.contains(Point(x-limitX*2,y-limitY*2))) or (polygon1.contains(Point(x+limitX*2,y+limitY*2))):
-            #if(polygon1.contains(Point(x,y))):
-                pp=0
-            else:
-                   cv2.imshow('Frame', img)
-               # Press q on keyboard to exit
-                   if cv2.waitKey(25) & 0xFF == ord('q'): break 
-                   # saving video
-                   video_writer.write(img)  
-                   continue
-           
-            x_off=3
-            y_off=2
-            
-            x_resize=220
-            y_resize=70
-            
-            Resize_xfactor=1.78
-            Resize_yfactor=1.78
-            
-            ContLoop=0
-            
-            SwFounded=0
-            
-            BilateralOption=0
-            
-            TabLicensesFounded, ContLicensesFounded= FindLicenseNumber (gray, x_off, y_off,  License, x_resize, y_resize, \
-                                   Resize_xfactor, Resize_yfactor, BilateralOption)
-              
-            
-            print(TabLicensesFounded)
-            print(ContLicensesFounded)
-            
-            ymax=-1
-            contmax=0
-            licensemax=""
-          
-            for z in range(len(TabLicensesFounded)):
-                if ContLicensesFounded[z] > contmax:
-                    contmax=ContLicensesFounded[z]
-                    licensemax=TabLicensesFounded[z]
-            
-            if licensemax == License:
-               print(License + " correctly recognized") 
-               TotHits+=1
-            else:
-                print(License + " Detected but not correctly recognized")
-                TotFailures +=1
-            #########################################
-            #########################################
-            print ("")  
-            lineaw=[]
-            lineaw.append(License) 
-            lineaw.append(licensemax)
-            lineaWrite =','.join(lineaw)
-            lineaWrite=lineaWrite + "\n"
-            w.write(lineaWrite)
-            #if len(licensemax) < 2: continue
-            SwFounded=0
-            for i in range( len(TabLicensesmax)):
-                if licensemax==TabLicensesmax[i]:
-                    ContLicensesmax[i]=ContLicensesmax[i]+1
-                    TimeEndLicensesmax[i]=time.time()
-                    SwFounded=1
-                    break
-            if SwFounded ==0:    
-                    TabLicensesmax.append(licensemax)
-                    ContLicensesmax.append(1)
-                    TimeIniLicensesmax.append(time.time())
-                    TimeEndLicensesmax.append(time.time())
-            #y-limitY:y+limitY,x-limitX:x+limitX 
-            start_point=(x-limitX,y-limitY) 
-            end_point=(x+limitX, y+limitY)
-            color=(0,0,255)
-            # Using cv2.rectangle() method
-            # Draw a rectangle with blue line borders of thickness of 2 px
-            img = cv2.rectangle(img, start_point, end_point,(36,255,12), 1)
-            # Put text
-            text_location = (x, y)
-            text_color = (255,255,255)
-            cv2.putText(img, licensemax ,text_location
-                    , cv2.FONT_HERSHEY_SIMPLEX , 1
-                    , text_color, 2 ,cv2.LINE_AA)
-            cv2.imshow('Frame', img)
-        # Press q on keyboard to exit
-            if cv2.waitKey(25) & 0xFF == ord('q'): break 
-            # saving video
-            video_writer.write(img)
-           # a los 10 minutos = 600 segundos acaba     
-            if time.time() - TimeIni > TimeLimit:
                 
-                break
+            for i in range(len(TabImgSelect)):
+                gray=TabImgSelect[i] 
+                #if(polygon1.contains(Point(int((x+limitX)/2),int((y+limitY)/2)))):
+                #if(polygon1.contains(Point(x[i]-limitX[i]*2,y[i]-limitY[i]*2))) or (polygon1.contains(Point(x[i]+limitX[i]*2,y[i]+limitY[i]*2))):
+                if(polygon1.contains(Point(x[i]-limitX[i],y[i]-limitY[i]))) or (polygon1.contains(Point(x[i]+limitX[i],y[i]+limitY[i]))):
+                #if(polygon1.contains(Point(x,y))):
+                    pp=0
+                else:
+                       cv2.imshow('Frame', img)
+                   # Press q on keyboard to exit
+                       if cv2.waitKey(25) & 0xFF == ord('q'): break 
+                       # saving video
+                       video_writer.write(img)  
+                       continue
                
-                #print(TabLicensesmax)
-                #print(ContLicensesmax)
-                #break
+                x_off=3
+                y_off=2
+                
+                x_resize=220
+                y_resize=70
+                
+                Resize_xfactor=1.78
+                Resize_yfactor=1.78
+                
+                ContLoop=0
+                
+                SwFounded=0
+                
+                BilateralOption=0
+                
+                TabLicensesFounded, ContLicensesFounded= FindLicenseNumber (gray, x_off, y_off,  License, x_resize, y_resize, \
+                                       Resize_xfactor, Resize_yfactor, BilateralOption)
+                  
+                
+                print(TabLicensesFounded)
+                print(ContLicensesFounded)
+                
+                ymax=-1
+                contmax=0
+                licensemax=""
+              
+                for z in range(len(TabLicensesFounded)):
+                    if ContLicensesFounded[z] > contmax:
+                        contmax=ContLicensesFounded[z]
+                        licensemax=TabLicensesFounded[z]
+                
+                if licensemax == License:
+                   print(License + " correctly recognized") 
+                   TotHits+=1
+                else:
+                    print(License + " Detected but not correctly recognized")
+                    TotFailures +=1
+                #########################################
+                #########################################
+                print ("")  
+                lineaw=[]
+                lineaw.append(License) 
+                lineaw.append(licensemax)
+                lineaWrite =','.join(lineaw)
+                lineaWrite=lineaWrite + "\n"
+                w.write(lineaWrite)
+                #if len(licensemax) < 2: continue
+                SwFounded=0
+                for p in range( len(TabLicensesmax)):
+                    if licensemax==TabLicensesmax[p]:
+                        ContLicensesmax[p]=ContLicensesmax[p]+1
+                        TimeEndLicensesmax[p]=time.time()
+                        SwFounded=1
+                        break
+                if SwFounded ==0:    
+                        TabLicensesmax.append(licensemax)
+                        ContLicensesmax.append(1)
+                        TimeIniLicensesmax.append(time.time())
+                        TimeEndLicensesmax.append(time.time())
+                #y-limitY:y+limitY,x-limitX:x+limitX 
+                start_point=(x[i]-limitX[i],y[i]-limitY[i]) 
+                end_point=(x[i]+limitX[i], y[i]+limitY[i])
+                color=(0,0,255)
+                # Using cv2.rectangle() method
+                # Draw a rectangle with blue line borders of thickness of 2 px
+                img = cv2.rectangle(img, start_point, end_point,(36,255,12), 1)
+                # Put text
+                text_location = (x[i], y[i])
+                text_color = (255,255,255)
+                cv2.putText(img, licensemax ,text_location
+                        , cv2.FONT_HERSHEY_SIMPLEX , 1
+                        , text_color, 2 ,cv2.LINE_AA)
+                cv2.imshow('Frame', img)
+            # Press q on keyboard to exit
+                if cv2.waitKey(25) & 0xFF == ord('q'): break 
+                # saving video
+                video_writer.write(img)
+               # a los 10 minutos = 600 segundos acaba     
+                if time.time() - TimeIni > TimeLimit:
+                    
+                    break
+                   
+                    #print(TabLicensesmax)
+                    #print(ContLicensesmax)
+                    #break
      cap.release()
      video_writer.release()
      cv2.destroyAllWindows()
