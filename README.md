@@ -33,25 +33,21 @@ since speed detection is performed over a region of the video, marked with a gre
 
 As a result, the console gets the following output:
 
-AR606L Speed: 16.2Km/h  snapshots: 5
+AR606L Speed: 20.25Km/h  snapshots: 4
 
-AR6061 Speed: 81.0Km/h  snapshots: 1
+AE670S Speed: 20.25Km/h  snapshots: 4
 
-AE670S Speed: 40.5Km/h  snapshots: 2
+5T0S Speed: 81.0Km/h  snapshots: 1
 
-APH188 Speed: 81.0Km/h  snapshots: 1
+APHI88 Speed: 81.0Km/h  snapshots: 1
 
-A3K96 Speed: 40.5Km/h  snapshots: 2
-
-A3K961 Speed: 81.0Km/h  snapshots: 1
-
-3K96 Speed: 81.0Km/h  snapshots: 1
+A3K96 Speed: 27.0Km/h  snapshots: 3
 
 A968B6 Speed: 40.5Km/h  snapshots: 2
 
-AV6190 Speed: 27.0Km/h  snapshots: 3
+AV6190 Speed: 40.5Km/h  snapshots: 2
 
-In which it is verified that the speed is determined by the number of snapshots in the delimited region of interest and errors coming from false registration detections such as AR6061 that is a false registration of AR606L or A3K96 and 3K96 that are  false detection of A3K961
+In which it is verified that the speed is determined by the number of snapshots in the delimited region of interest
 
 Comparing  with the project https://github.com/ablanco1950/DetectSpeedLicensePlate_Yolov8_Filters_PaddleOCR the results are distinct but similars.
 
